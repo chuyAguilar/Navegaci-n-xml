@@ -11,7 +11,7 @@
       Type="MmfVideo"
       FrameSize="640 480"
       VideoFormat="MJPG"
-      CaptureDeviceId="0">
+      CaptureDeviceId="1">
 
       <DataSources>
         <DataSource Type="Video" Id="Video" PortUsImageOrientation="MF"/>
