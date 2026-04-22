@@ -1,0 +1,117 @@
+<PlusConfiguration version="2.4">
+
+  <DataCollection StartupDelaySec="1.0">
+
+    <DeviceSet
+      Name="TEST: Dual Marker Tracking"
+      Description="Marker0 (base) + Marker5 (lezna)" />
+
+    <!-- VIDEO -->
+    <Device
+      Id="VideoDevice"
+      Type="MmfVideo"
+      FrameSize="640 480"
+      VideoFormat="YUY2"
+      CaptureDeviceId="0"
+      AcquisitionRate="30"
+      LocalTimeOffsetSec="0">
+
+      <DataSources>
+        <DataSource 
+          Type="Video" 
+          Id="Video" 
+          PortUsImageOrientation="MF" 
+          ImageType="RGB_COLOR"
+          BufferSize="5"
+          AveragedItemsForFiltering="15"/>
+      </DataSources>
+
+      <OutputChannels>
+        <OutputChannel 
+          Id="VideoStream" 
+          VideoDataSourceId="Video"/>
+      </OutputChannels>
+
+    </Device>
+
+    <!-- TRACKER -->
+    <Device
+      Id="TrackerDevice"
+      Type="OpticalMarkerTracker"
+      CameraCalibrationFile="OpticalMarkerTracker/camera_calibration.yml"
+      ToolReferenceFrame="Tracker"
+      TrackingMethod="OPTICAL"
+      MarkerDictionary="ARUCO_MIP_36h12">
+
+      <DataSources>
+        <!-- HUESO (REFERENCIA) -->
+        <DataSource 
+          Type="Tool" 
+          Id="Marker0" 
+          MarkerId="0" 
+          MarkerSizeMm="100" />
+
+        <!-- LEZNA -->
+        <DataSource 
+          Type="Tool" 
+          Id="Marker5" 
+          MarkerId="5" 
+          MarkerSizeMm="80" />
+      </DataSources>
+
+      <InputChannels>
+        <InputChannel Id="VideoStream"/>
+      </InputChannels>
+
+      <OutputChannels>
+        <OutputChannel Id="TrackerStream">
+          <DataSource Id="Marker0"/>
+          <DataSource Id="Marker5"/>
+        </OutputChannel>
+      </OutputChannels>
+
+    </Device>
+
+  </DataCollection>
+
+  <!-- TRANSFORMS -->
+  <PlusOpenIGTLinkServer
+    ListeningPort="18944"
+    OutputChannelId="TrackerStream"
+    MaxNumberOfIgtlMessagesToSend="1"
+    MaxTimeSpentWithProcessingMs="50"
+    SendValidTransformsOnly="true">
+
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="TRANSFORM"/>
+      </MessageTypes>
+
+      <TransformNames>
+        <Transform Name="Marker0ToTracker"/>
+        <Transform Name="Marker5ToTracker"/>
+      </TransformNames>
+
+    </DefaultClientInfo>
+
+  </PlusOpenIGTLinkServer>
+
+  <!-- VIDEO -->
+  <PlusOpenIGTLinkServer
+    ListeningPort="18945"
+    OutputChannelId="VideoStream"
+    MaxNumberOfIgtlMessagesToSend="1"
+    MaxTimeSpentWithProcessingMs="50">
+
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="IMAGE"/>
+      </MessageTypes>
+      <ImageNames>
+        <Image Name="Image" EmbeddedTransformToFrame="Image"/>
+      </ImageNames>
+    </DefaultClientInfo>
+
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>

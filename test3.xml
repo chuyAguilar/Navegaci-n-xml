@@ -1,0 +1,97 @@
+<PlusConfiguration version="2.4">
+
+  <DataCollection StartupDelaySec="1.0">
+
+    <DeviceSet
+      Name="TEST: Marker5 ONLY"
+      Description="Validacion aislada de marker 5" />
+
+    <!-- VIDEO -->
+    <Device
+      Id="VideoDevice"
+      Type="MmfVideo"
+      FrameSize="640 480"
+      VideoFormat="YUY2"
+      CaptureDeviceId="0"
+      RequestedFrameRate="30">
+
+      <DataSources>
+        <DataSource 
+          Type="Video" 
+          Id="Video" 
+          PortUsImageOrientation="UF" 
+          ImageType="RGB_COLOR"/>
+      </DataSources>
+
+      <OutputChannels>
+        <OutputChannel 
+          Id="VideoStream" 
+          VideoDataSourceId="Video"/>
+      </OutputChannels>
+
+    </Device>
+
+    <!-- TRACKER -->
+    <Device
+      Id="TrackerDevice"
+      Type="OpticalMarkerTracker"
+      CameraCalibrationFile="OpticalMarkerTracker/calibration.yml"
+      ToolReferenceFrame="Tracker"
+      TrackingMethod="OPTICAL"
+      MarkerDictionary="ARUCO_MIP_36h12">
+
+      <DataSources>
+        <DataSource 
+          Type="Tool" 
+          Id="Reference" 
+          MarkerId="5" 
+          MarkerSizeMm="28" />
+      </DataSources>
+
+      <InputChannels>
+        <InputChannel Id="VideoStream"/>
+      </InputChannels>
+
+      <OutputChannels>
+        <OutputChannel Id="TrackerStream">
+          <DataSource Id="Reference"/>
+        </OutputChannel>
+      </OutputChannels>
+
+    </Device>
+
+  </DataCollection>
+
+  <!-- TRANSFORMS -->
+  <PlusOpenIGTLinkServer
+    ListeningPort="18944"
+    OutputChannelId="TrackerStream">
+
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="TRANSFORM"/>
+      </MessageTypes>
+      <TransformNames>
+        <Transform Name="ReferenceToTracker"/>
+      </TransformNames>
+    </DefaultClientInfo>
+
+  </PlusOpenIGTLinkServer>
+
+  <!-- VIDEO -->
+  <PlusOpenIGTLinkServer
+    ListeningPort="18945"
+    OutputChannelId="VideoStream">
+
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="IMAGE"/>
+      </MessageTypes>
+      <ImageNames>
+        <Image Name="Image" EmbeddedTransformToFrame="Image"/>
+      </ImageNames>
+    </DefaultClientInfo>
+
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>

@@ -1,0 +1,43 @@
+<PlusConfiguration version="2.0">
+
+  <DataCollection StartupDelaySec="2.0">
+
+    <DeviceSet 
+      Name="TEST: MMF Camera"
+      Description="MMF webcam test" />
+
+    <Device
+      Id="VideoDevice"
+      Type="MmfVideo"
+      FrameSize="640 480"
+      VideoFormat="YUY2"
+      CaptureDeviceId="0">
+
+      <DataSources>
+        <DataSource Type="Video" Id="Video" PortUsImageOrientation="MF"/>
+      </DataSources>
+
+      <OutputChannels>
+        <OutputChannel Id="VideoStream" VideoDataSourceId="Video"/>
+      </OutputChannels>
+
+    </Device>
+
+  </DataCollection>
+
+  <PlusOpenIGTLinkServer
+    ListeningPort="18944"
+    OutputChannelId="VideoStream">
+
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="IMAGE"/>
+      </MessageTypes>
+      <ImageNames>
+        <Image Name="Image" EmbeddedTransformToFrame="Image"/>
+      </ImageNames>
+    </DefaultClientInfo>
+
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>
